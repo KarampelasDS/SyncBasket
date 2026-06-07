@@ -13,6 +13,8 @@ model User {
   password  String
   name      String
   lists     ListMember[]
+  invitesSent     Invite[] @relation("InvitesSent")
+  invitesReceived Invite[] @relation("InvitesReceived")
   createdAt DateTime     @default(now())
 }
 
@@ -21,14 +23,16 @@ model List {
   name      String
   members   ListMember[]
   items     Item[]
+  invites   Invite[]
   createdAt DateTime     @default(now())
+  visibility Visibility @default(PRIVATE)
 }
 
 model ListMember {
   id     String @id @default(uuid())
-  user   User   @relation(fields: [userId], references: [id])
+  user   User   @relation(fields: [userId], references: [id],onDelete: Cascade)
   userId String
-  list   List   @relation(fields: [listId], references: [id])
+  list   List   @relation(fields: [listId], references: [id],onDelete: Cascade)
   listId String
   role   Role   @default(MEMBER)
 
@@ -41,12 +45,37 @@ model Item {
   quantity  Int      @default(1)
   checked   Boolean  @default(false)
   url       String?
-  list      List     @relation(fields: [listId], references: [id])
+  list      List     @relation(fields: [listId], references: [id],onDelete: Cascade)
   listId    String
   createdAt DateTime @default(now())
+}
+
+model Invite {
+  id String @id @default(uuid())
+  list List @relation(fields:[listId], references:[id],onDelete: Cascade)
+  listId String
+  inviter User @relation("InvitesSent",fields:[inviterId],references:[id],onDelete: Cascade)
+  inviterId String
+  invitee User @relation("InvitesReceived",fields:[inviteeId],references:[id],onDelete: Cascade)
+  inviteeId String
+  status InviteStatus @default(PENDING)
+  createdAt DateTime @default(now())
+
+  @@unique([listId, inviteeId])
 }
 
 enum Role {
   OWNER
   MEMBER
+}
+
+enum Visibility {
+  PRIVATE
+  PUBLIC
+}
+
+enum InviteStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
 }
