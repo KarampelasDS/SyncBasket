@@ -3,11 +3,16 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 //Create New List
-export const createList = async (userId: string, name: string) => {
+export const createList = async (
+  userId: string,
+  name: string,
+  visibility: "PUBLIC" | "PRIVATE",
+) => {
   const result = await prisma.$transaction(async (tx) => {
     const txList = await tx.list.create({
       data: {
         name,
+        visibility,
       },
     });
     await tx.listMember.create({
