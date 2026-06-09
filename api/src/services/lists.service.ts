@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 export const createList = async (
   userId: string,
   name: string,
-  visibility: "PUBLIC" | "PRIVATE",
+  visibility: "PUBLIC" | "PRIVATE" = "PRIVATE",
 ) => {
   const result = await prisma.$transaction(async (tx) => {
     const txList = await tx.list.create({
