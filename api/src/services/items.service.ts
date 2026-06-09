@@ -25,6 +25,22 @@ export const createItem = async (
   return item;
 };
 
+export const getItems = async (listId: string, userId: string) => {
+  const list = await prisma.list.findUnique({
+    where: { id: listId },
+    select: { visibility: true },
+  });
+  const member = await prisma.listMember.findUnique({
+    where: { userId_listId: { userId, listId } },
+  });
+  if (!member && list?.visibility !== "PUBLIC")
+    throw new Error("Authorization Error");
+  const items = await prisma.item.findMany({
+    where: { listId },
+  });
+  return items;
+};
+
 export const updateItem = async (
   listId: string,
   itemId: string,

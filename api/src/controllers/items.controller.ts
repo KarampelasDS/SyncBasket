@@ -22,6 +22,19 @@ export const createItem = async (req: Request, res: Response) => {
   }
 };
 
+export const getItems = async (req: Request, res: Response) => {
+  try {
+    const { listId } = req.params;
+    const userId = req.userId as string;
+    const items = await itemsService.getItems(listId as string, userId);
+    res.status(200).json(items);
+  } catch (error) {
+    res.status(400).json({
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
+  }
+};
+
 export const updateItem = async (req: Request, res: Response) => {
   try {
     const { listId, itemId } = req.params;
