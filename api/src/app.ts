@@ -1,4 +1,4 @@
-import express from "express";
+import express, { NextFunction, Request, Response } from "express";
 import cors from "cors";
 import authRoutes from "./routes/auth";
 import listsRoutes from "./routes/lists";
@@ -17,6 +17,10 @@ app.use("/invites", invitesRoutes);
 
 app.get("/health", (_req, res) => {
   res.json({ status: "ok" });
+});
+
+app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
+  res.status(500).json({ error: "Internal server error" });
 });
 
 export default app;

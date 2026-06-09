@@ -1,6 +1,5 @@
-import { PrismaClient } from "@prisma/client";
+import prisma from "../utils/prisma";
 
-const prisma = new PrismaClient();
 
 export const createItem = async (
   listId: string,
@@ -13,7 +12,7 @@ export const createItem = async (
     where: { userId_listId: { userId, listId } },
   });
   if (!member || member.role === "VIEWER")
-    throw new Error("Authorization Error");
+    throw new Error("Forbidden");
   const item = await prisma.item.create({
     data: {
       listId,
@@ -34,7 +33,7 @@ export const getItems = async (listId: string, userId: string) => {
     where: { userId_listId: { userId, listId } },
   });
   if (!member && list?.visibility !== "PUBLIC")
-    throw new Error("Authorization Error");
+    throw new Error("Forbidden");
   const items = await prisma.item.findMany({
     where: { listId },
   });
@@ -54,11 +53,11 @@ export const updateItem = async (
     where: { userId_listId: { userId, listId } },
   });
   if (!member || member.role === "VIEWER")
-    throw new Error("Authorization Error");
+    throw new Error("Forbidden");
   const item = await prisma.item.findUnique({
-    where: { id: itemId },
+    where: { id: itemId, listId },
   });
-  if (!item) throw new Error("Item not found");
+  if (!item) throw new Error("Forbidden");
   const updatedItem = await prisma.item.update({
     where: { id: itemId },
     data: { name, url, quantity, checked },
@@ -75,11 +74,11 @@ export const deleteItem = async (
     where: { userId_listId: { userId, listId } },
   });
   if (!member || member.role === "VIEWER")
-    throw new Error("Authorization Error");
+    throw new Error("Forbidden");
   const item = await prisma.item.findUnique({
-    where: { id: itemId },
+    where: { id: itemId, listId },
   });
-  if (!item) throw new Error("Item not found");
+  if (!item) throw new Error("Forbidden");
   const deletedItem = await prisma.item.delete({
     where: { id: itemId },
   });

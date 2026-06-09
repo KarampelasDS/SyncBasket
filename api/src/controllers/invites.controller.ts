@@ -10,10 +10,6 @@ export const sendInvite = async (req: Request, res: Response) => {
       });
     }
     const inviterId = req.userId as string;
-    const alreadyMember = await prisma.listMember.findUnique({
-      where: { userId_listId: { userId: invitee.id, listId } },
-    });
-    if (alreadyMember) throw new Error("User is already a member of this list");
     const result = await invitesService.sendInvite(
       listId,
       inviterId,
@@ -36,6 +32,9 @@ export const respondToInvite = async (req: Request, res: Response) => {
       return res.status(400).json({
         error: "Invite ID and response are required",
       });
+    }
+    if (response !== "ACCEPTED" && response !== "REJECTED") {
+      return res.status(400).json({ error: "Response must be ACCEPTED or REJECTED" });
     }
     const userId = req.userId as string;
     const result = await invitesService.respondToInvite(

@@ -1,6 +1,4 @@
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import prisma from "../utils/prisma";
 
 export const sendInvite = async (
   listId: string,
@@ -45,20 +43,23 @@ export const respondToInvite = async (
     throw new Error("Authorization Error");
   if (invite.status !== "PENDING")
     throw new Error("Invite already responded to");
-  const updatedInvite = await prisma.invite.update({
-    data: { status: response },
-    where: { id: inviteId },
-  });
-  if (response === "ACCEPTED") {
-    await prisma.listMember.create({
-      data: {
-        userId,
-        listId: invite.listId,
-        role: invite.role,
-      },
+
+  return prisma.$transaction(async (tx) => {
+    const updatedInvite = await tx.invite.update({
+      data: { status: response },
+      where: { id: inviteId, status: "PENDING" },
     });
-  }
-  return updatedInvite;
+    if (response === "ACCEPTED") {
+      await tx.listMember.create({
+        data: {
+          userId,
+          listId: invite.listId,
+          role: invite.role,
+        },
+      });
+    }
+    return updatedInvite;
+  });
 };
 
 export const getInvites = async (userId: string) => {

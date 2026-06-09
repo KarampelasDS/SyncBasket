@@ -1,6 +1,5 @@
-import { PrismaClient } from "@prisma/client";
+import prisma from "../utils/prisma";
 
-const prisma = new PrismaClient();
 
 //Create New List
 export const createList = async (
@@ -46,7 +45,7 @@ export const getList = async (id: string, userId: string) => {
     where: { userId_listId: { userId, listId: id } },
   });
   if (!member && isPublic?.visibility !== "PUBLIC")
-    throw new Error("Authorization Error");
+    throw new Error("Forbidden");
   const list = await prisma.list.findUnique({
     where: { id },
     include: { items: true },
@@ -60,7 +59,7 @@ export const deleteList = async (id: string, userId: string) => {
     where: { userId_listId: { userId, listId: id } },
   });
   if (!member || member.role !== "OWNER")
-    throw new Error("Authorization Error");
+    throw new Error("Forbidden");
   await prisma.list.delete({ where: { id } });
   return { success: true };
 };
@@ -71,7 +70,7 @@ export const renameList = async (id: string, name: string, userId: string) => {
     where: { userId_listId: { userId, listId: id } },
   });
   if (!member || member.role !== "OWNER")
-    throw new Error("Authorization Error");
+    throw new Error("Forbidden");
   const list = await prisma.list.update({
     where: { id },
     data: { name },

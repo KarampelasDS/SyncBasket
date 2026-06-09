@@ -8,7 +8,7 @@ router.use(authenticate);
 
 router.get("/", itemsController.getItems);
 router.post("/", itemsController.createItem);
-router.delete("/:id", itemsController.deleteItem);
-router.patch("/:id", itemsController.updateItem);
+router.delete("/:itemId", itemsController.deleteItem);
+router.patch("/:itemId", itemsController.updateItem);
 
 export default router;
