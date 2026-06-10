@@ -4,11 +4,13 @@ import authRoutes from "./routes/auth";
 import listsRoutes from "./routes/lists";
 import itemsRoutes from "./routes/items";
 import invitesRoutes from "./routes/invites";
+import { globalLimiter } from "./middleware/rateLimit";
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+app.use(globalLimiter);
 
 app.use("/auth", authRoutes);
 app.use("/lists", listsRoutes);
