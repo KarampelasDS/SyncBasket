@@ -15,7 +15,7 @@ const mockFindUnique = prisma.user.findUnique as jest.Mock;
 const mockCreate = prisma.user.create as jest.Mock;
 
 describe("auth.service", () => {
-  // ─── register ────────────────────────────────────────────────────────────
+  // ─── register ──────────────────────────────────────────────────────────────
 
   describe("register", () => {
     it("creates a user and returns a token when email is not taken", async () => {
@@ -27,7 +27,11 @@ describe("auth.service", () => {
         password: "hashed",
       });
 
-      const result = await register("Alice", "alice@example.com", "password123");
+      const result = await register(
+        "Alice",
+        "alice@example.com",
+        "password123",
+      );
 
       expect(result.token).toBeDefined();
       expect(result.user.email).toBe("alice@example.com");
@@ -36,10 +40,13 @@ describe("auth.service", () => {
     });
 
     it("throws when email is already taken", async () => {
-      mockFindUnique.mockResolvedValue({ id: "user-1", email: "alice@example.com" });
+      mockFindUnique.mockResolvedValue({
+        id: "user-1",
+        email: "alice@example.com",
+      });
 
       await expect(
-        register("Alice", "alice@example.com", "password123")
+        register("Alice", "alice@example.com", "password123"),
       ).rejects.toThrow("Invalid Credentials");
     });
   });
@@ -67,7 +74,7 @@ describe("auth.service", () => {
       mockFindUnique.mockResolvedValue(null);
 
       await expect(login("nobody@example.com", "password123")).rejects.toThrow(
-        "Invalid Credentials"
+        "Invalid Credentials",
       );
     });
 
@@ -80,7 +87,7 @@ describe("auth.service", () => {
       });
 
       await expect(login("alice@example.com", "wrongpassword")).rejects.toThrow(
-        "Invalid Credentials"
+        "Invalid Credentials",
       );
     });
   });
