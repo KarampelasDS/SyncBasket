@@ -5,11 +5,13 @@ import listsRoutes from "./routes/lists";
 import itemsRoutes from "./routes/items";
 import invitesRoutes from "./routes/invites";
 import { globalLimiter } from "./middleware/rateLimit";
+import cookieParser from "cookie-parser";
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+app.use(cookieParser());
 app.use(globalLimiter);
 
 app.use("/auth", authRoutes);
